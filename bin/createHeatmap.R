@@ -74,9 +74,54 @@ annoColors <- list(
 ################################################
 ################################################
 
+pdf(paste0("basic_heatmap_", outprefix, ".pdf"), width = 12, height = 14)
+pheatmap(sampleData,
+         clustering_distance_rows = "euclidean",
+         clustering_distance_cols = "euclidean",
+         clustering_method = "ward.D",
+         show_rownames = TRUE,
+         show_colnames = TRUE,
+         fontsize_row = 10,
+         fontsize_col = 10,
+         main = "Basic Gene Expression Heatmap")
+dev.off()
 
 ################################################
 ################################################
-## Create a basic heatmap##
+## Create a complex heatmap##
 ################################################
 ################################################
+
+## Generate breaks for quantiles representing low, medium, and high categories
+quantile_cutoffs <- quantile(as.matrix(sampleData), probs = c(0, 1/3, 2/3, 1))
+
+# Open a PDF file to save the complex heatmap
+output_pdf <- paste0("complex_heatmap_", outprefix, ".pdf")
+pdf(output_pdf, width = 12, height = 14)
+
+# Create the heatmap with desired settings
+pheatmap(
+  mat = sampleData,
+  clustering_distance_rows = "euclidean",
+  clustering_distance_cols = "euclidean",
+  clustering_method = "ward.D",
+  annotation_col = annoData,          
+  annotation_row = geneFunctions,     
+  annotation_colors = annoColors,     
+  show_rownames = TRUE,               
+  show_colnames = TRUE,               
+  annotation_names_row = FALSE,       
+  annotation_names_col = FALSE,       
+  breaks = quantile_cutoffs,          
+  color = c("#0571b0", "#8c96c6", "#ca0020"), 
+  legend_breaks = c(
+    mean(quantile_cutoffs[1:2]),
+    mean(quantile_cutoffs[2:3]),
+    mean(quantile_cutoffs[3:4])
+  ),
+  legend_labels = c("Low", "Medium", "High"),
+  main = "Complex Gene Expression Heatmap with Sample Annotations"
+)
+
+# Close the PDF output to save the heatmap
+dev.off()
