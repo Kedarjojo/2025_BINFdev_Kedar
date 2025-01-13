@@ -2,6 +2,10 @@ process FASTQC {
     tag "$meta.id"
     label 'process_low'
 
+    cpus   = { check_max( 6 * task.attempt, 'cpus' ) }
+    memory = { check_max( 36.GB * task.attempt, 'memory' ) }
+    time   = { check_max( 8.h * task.attempt, 'time' ) }
+
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/fastqc:0.12.1--hdfd78af_0' :
